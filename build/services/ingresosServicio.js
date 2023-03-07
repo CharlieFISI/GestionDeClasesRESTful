@@ -97,21 +97,29 @@ async function updateIdEntry(req, res) {
         const { id } = req.params;
         const updateEntry = req.body;
         const conn = await (0, conexion_1.connect)();
-        const UsuarioIdExist = await conn.query('SELECT * FROM Usuarios WHERE UsuarioId = ?', [updateEntry.UsuarioId]);
-        const ClienteIdExist = await conn.query('SELECT * FROM Clientes WHERE ClienteId = ?', [updateEntry.ClienteId]);
-        if (UsuarioIdExist[0].length === 0 && ClienteIdExist[0].length === 0) {
-            return res.status(404).json({ message: 'El registro con el id especificado no existe' });
+        const updateId = await conn.query('SELECT * FROM Ingresos WHERE IngresoId = ?', [id]);
+        if (updateId[0].length === 0) {
+            return res.status(404).json({ message: 'El registro con el id especificado en la ruta no existe' });
         }
         else {
-            const updateId = await conn.query('SELECT * FROM Ingresos WHERE IngresoId = ?', [id]);
-            await conn.query('UPDATE Ingresos set ? WHERE IngresoId = ?', [updateEntry, id]);
-            if (updateId[0].length === 0) {
-                return res.status(404).json({ message: 'El registro con el id especificado no existe' });
-            }
-            else {
+            if (updateEntry.UsuarioId === null || updateEntry.ClienteId === null) {
+                await conn.query('UPDATE Ingresos set ? WHERE IngresoId = ?', [updateEntry, id]);
                 return res.json({
                     message: 'Entrada de Clase actualizada'
                 });
+            }
+            else {
+                const UsuarioIdExist = await conn.query('SELECT * FROM Usuarios WHERE UsuarioId = ?', [updateEntry.UsuarioId]);
+                const ClienteIdExist = await conn.query('SELECT * FROM Clientes WHERE ClienteId = ?', [updateEntry.ClienteId]);
+                if (UsuarioIdExist[0].length === 0 && ClienteIdExist[0].length === 0) {
+                    return res.status(404).json({ message: 'El registro con el id especificado no existe' });
+                }
+                else {
+                    await conn.query('UPDATE Ingresos set ? WHERE IngresoId = ?', [updateEntry, id]);
+                    return res.json({
+                        message: 'Entrada de Clase actualizada'
+                    });
+                }
             }
         }
     }
