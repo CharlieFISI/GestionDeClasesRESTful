@@ -6,7 +6,7 @@ const utils_1 = require("../utils");
 async function getAllEntries(_req, res) {
     try {
         const conn = await (0, conexion_1.connect)();
-        const getAll = await conn.query('SELECT * FROM Ingresos');
+        const getAll = await conn.query('SELECT * FROM Ingresos WHERE TipoIngreso = ?', 'clases');
         return res.json(getAll[0]);
     }
     catch (e) {
