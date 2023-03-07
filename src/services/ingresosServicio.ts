@@ -7,7 +7,7 @@ import { RowDataPacket } from 'mysql2/promise'
 export async function getAllEntries (_req: Request, res: Response): Promise<Response> {
   try {
     const conn = await connect()
-    const getAll = await conn.query('SELECT * FROM Clases')
+    const getAll = await conn.query('SELECT * FROM Ingresos')
     return res.json(getAll[0])
   } catch (e) {
     let message
