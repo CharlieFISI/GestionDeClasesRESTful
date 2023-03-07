@@ -25,7 +25,7 @@ async function addEntry(req, res) {
         const conn = await (0, conexion_1.connect)();
         const IngresoIdUnique = await conn.query('SELECT * FROM Clases WHERE IngresoId = ?', [newEntry.IngresoId]);
         const IngresoIdExist = await conn.query('SELECT * FROM Ingresos WHERE IngresoId = ?', [newEntry.IngresoId]);
-        const [IngresoIsClase] = await conn.query('SELECT TipoIngreso FROM WHERE IngresoId = ?', [newEntry.IngresoId]);
+        const [IngresoIsClase] = await conn.query('SELECT TipoIngreso FROM Ingresos WHERE IngresoId = ?', [newEntry.IngresoId]);
         if (IngresoIsClase[0].TipoIngreso !== 'clases') {
             return res.status(404).json({ message: 'El registro con el IngresoId especificado no es un ingreso para Clases' });
         }

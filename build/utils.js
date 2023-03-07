@@ -82,7 +82,7 @@ const addClaseEntry = (object) => {
 exports.addClaseEntry = addClaseEntry;
 const addIngresoEntry = (object) => {
     const newEntry = {
-        TipoIngreso: parseTipoIngreso(object.TipoIngreso),
+        TipoIngreso: parseTipoIngreso('clases'),
         UsuarioId: parseUsuarioId(object.UsuarioId),
         ClienteId: parseClienteId(object.ClienteId),
         MontoTotal: parseMontoTotal(object.MontoTotal),
