@@ -83,19 +83,26 @@ export async function updateIdEntry (req: Request, res: Response): Promise<Respo
     const { id } = req.params
     const updateEntry: IngresoEntry = req.body
     const conn = await connect()
+    const updateId = await conn.query('SELECT * FROM Ingresos WHERE IngresoId = ?', [id]) as RowDataPacket[]
     const UsuarioIdExist = await conn.query('SELECT * FROM Usuarios WHERE UsuarioId = ?', [updateEntry.UsuarioId]) as RowDataPacket[]
     const ClienteIdExist = await conn.query('SELECT * FROM Clientes WHERE ClienteId = ?', [updateEntry.ClienteId]) as RowDataPacket[]
-    if (UsuarioIdExist[0].length === 0 && ClienteIdExist[0].length === 0) {
+    if (updateId[0].length === 0) {
       return res.status(404).json({ message: 'El registro con el id especificado no existe' })
     } else {
-      const updateId = await conn.query('SELECT * FROM Ingresos WHERE IngresoId = ?', [id]) as RowDataPacket[]
-      await conn.query('UPDATE Ingresos set ? WHERE IngresoId = ?', [updateEntry, id])
-      if (updateId[0].length === 0) {
-        return res.status(404).json({ message: 'El registro con el id especificado no existe' })
-      } else {
+      if (updateEntry.UsuarioId === null || updateEntry.ClienteId === null) {
+        await conn.query('UPDATE Ingresos set ? WHERE IngresoId = ?', [updateEntry, id])
         return res.json({
           message: 'Entrada de Clase actualizada'
         })
+      } else {
+        if (UsuarioIdExist[0].length === 0 && ClienteIdExist[0].length === 0) {
+          return res.status(404).json({ message: 'El registro con el id especificado no existe' })
+        } else {
+          await conn.query('UPDATE Ingresos set ? WHERE IngresoId = ?', [updateEntry, id])
+          return res.json({
+            message: 'Entrada de Clase actualizada'
+          })
+        }
       }
     }
   } catch (e) {
