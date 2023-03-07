@@ -93,24 +93,27 @@ export async function updateIdEntry (req: Request, res: Response): Promise<Respo
     const updateEntry: ClaseEntry = req.body
     const conn = await connect()
     const updateId = await conn.query('SELECT * FROM Clases WHERE ClaseId = ?', [id]) as RowDataPacket[]
-    const IngresoIdUnique = await conn.query('SELECT * FROM Clases WHERE IngresoId = ?', [updateEntry.IngresoId]) as RowDataPacket[]
-    const IngresoIdExist = await conn.query('SELECT * FROM Ingresos WHERE IngresoId = ?', [updateEntry.IngresoId]) as RowDataPacket[]
-    if (IngresoIdExist[0].length === 0) {
+    if (updateId[0].length === 0) {
       return res.status(404).json({ message: 'El registro con el id especificado no existe' })
-    } else {
-      if (IngresoIdUnique[0].length !== 0) {
-        return res.status(404).json({ message: 'Existe un registro con el mismo IngresoId' })
-      } else {
-        await conn.query('UPDATE Clases set ? WHERE PlanIngresoId = ?', [updateEntry, id])
-        if (updateId[0].length === 0) {
-          return res.status(404).json({ message: 'El registro con el id especificado no existe' })
-        } else {
-          return res.json({
-            message: 'Entrada de Ingreso de clase actualizada'
-          })
-        }
+    }
+    if (!isNaN(updateEntry.IngresoId)) {
+      const IngresoIdExist = await conn.query('SELECT * FROM Ingresos WHERE IngresoId = ?', [updateEntry.IngresoId]) as RowDataPacket[]
+      if (IngresoIdExist[0].length === 0) {
+        return res.status(404).json({
+          message: 'El registro con el UsuarioId especificado no existe'
+        })
+      }
+      const [IngresoIdUnique] = await conn.query('SELECT ClaseId FROM Clases WHERE IngresoId = ?', [updateEntry.IngresoId]) as RowDataPacket[]
+      if (IngresoIdUnique.length !== 0 && IngresoIdUnique.ClaseId !== updateEntry.ClaseId) {
+        return res.status(404).json({
+          message: 'Existe un registro con el mismo IngresoId'
+        })
       }
     }
+    await conn.query('UPDATE Clases set ? WHERE ClaseId = ?', [updateEntry, id])
+    return res.json({
+      message: 'Entrada de Clase actualizada'
+    })
   } catch (e) {
     let message
     if (e instanceof Error) message = e.message
