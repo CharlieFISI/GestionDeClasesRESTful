@@ -105,7 +105,7 @@ export async function updateIdEntry (req: Request, res: Response): Promise<Respo
     }
     await conn.query('UPDATE Ingresos set ? WHERE IngresoId = ?', [updateEntry, id])
     return res.json({
-      message: 'Entrada de Clase actualizada'
+      message: 'Entrada de Ingreso actualizada'
     })
   } catch (e) {
     let message
